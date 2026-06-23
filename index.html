@@ -5,908 +5,791 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Master Inventory — Julian Johnson</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --forest:#0F1E14;--forest-mid:#1A2E1F;--forest-border:#2A3E2A;
+  --sage:#7A9E7E;--gold:#D4C89A;--gold-acc:#B8860B;
+  --cream:#F7F5F0;--cream-dark:#EDE8DE;
+  --text:#1A1612;--text-mid:#5A5040;--text-light:#A09880;
+  --border:#E0D8CC;--white:#fff;
+  --serif:'Playfair Display',Georgia,serif;
+  --body:'Lora',Georgia,serif;
+  --mono:'DM Mono','Courier New',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--cream);color:var(--text);min-height:100vh;line-height:1.6}
 
-  :root {
-    --forest: #0F1E14;
-    --forest-mid: #1A2E1F;
-    --forest-border: #2A3E2A;
-    --sage: #7A9E7E;
-    --sage-light: #E8F5EE;
-    --gold: #D4C89A;
-    --gold-accent: #B8860B;
-    --cream: #F7F5F0;
-    --cream-dark: #EDE8DE;
-    --text: #1A1612;
-    --text-mid: #5A5040;
-    --text-light: #A09880;
-    --border: #E0D8CC;
-    --white: #FFFFFF;
-    --serif: 'Playfair Display', Georgia, serif;
-    --body: 'Lora', Georgia, serif;
-    --mono: 'DM Mono', 'Courier New', monospace;
+/* HEADER */
+.hdr{background:var(--forest);color:#E8E0CC;padding:40px 32px 32px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(122,158,126,.12) 0%,transparent 70%);pointer-events:none}
+.hdr-in{max-width:1040px;margin:0 auto;position:relative}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--sage);margin-bottom:12px}
+.hdr h1{font-family:var(--serif);font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.hdr p{color:#A09880;font-size:15px;font-style:italic;margin-bottom:28px}
+.stats{display:flex;gap:14px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:13px 18px;min-width:105px}
+.stat-v{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--gold);line-height:1}
+.stat-l{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);margin-top:3px}
 
-    /* Category colors */
-    --qe: #2E7D52;
-    --qe-light: #E8F5EE;
-    --us: #1C3A5A;
-    --us-light: #E6EDF5;
-    --pf: #7B4F2E;
-    --pf-light: #F5EDE6;
-    --tr: #1A5C5C;
-    --tr-light: #E6F2F2;
-    --cb: #5C2E7A;
-    --cb-light: #EFE6F5;
-  }
+/* TABS */
+.tabs{background:var(--forest-mid);border-bottom:1px solid var(--forest-border);position:sticky;top:0;z-index:50}
+.tabs-in{max-width:1040px;margin:0 auto;display:flex;overflow-x:auto}
+.tb{background:none;border:none;border-bottom:2px solid transparent;color:#5A7A5A;padding:14px 20px;font-size:13px;cursor:pointer;font-family:var(--serif);letter-spacing:.02em;transition:color .2s,border-color .2s;white-space:nowrap}
+.tb.on{color:#D4E8D4;border-bottom-color:var(--sage)}
+.tb:hover{color:#9EC4A0}
 
-  html { scroll-behavior: smooth; }
+/* MAIN */
+.main{max-width:1040px;margin:0 auto;padding:26px 22px 60px}
 
-  body {
-    font-family: var(--body);
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-    line-height: 1.6;
-  }
+/* FILTERS */
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px}
+.fb{padding:6px 15px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text-mid);font-size:13px;cursor:pointer;font-family:var(--body);transition:all .18s}
+.fb:hover{border-color:#999}
+.fb.on{color:#fff;border-color:transparent}
 
-  /* ── HEADER ─────────────────────────────────────────────── */
-  .header {
-    background: var(--forest);
-    color: #E8E0CC;
-    padding: 44px 32px 36px;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -80px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(122,158,126,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-inner { max-width: 1000px; margin: 0 auto; position: relative; }
-  .header-eyebrow {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin-bottom: 14px;
-  }
-  .header-title {
-    font-family: var(--serif);
-    font-size: clamp(26px, 4vw, 40px);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-  }
-  .header-subtitle {
-    color: #A09880;
-    font-size: 15px;
-    font-style: italic;
-    margin-bottom: 30px;
-  }
-  .stats-row { display: flex; gap: 16px; flex-wrap: wrap; }
-  .stat-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 14px 20px;
-    min-width: 110px;
-  }
-  .stat-value {
-    font-family: var(--serif);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin-top: 4px;
-  }
+/* CARDS */
+.cards{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--white);border-radius:12px;border:1.5px solid var(--border);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.card.open{box-shadow:0 4px 24px rgba(0,0,0,.08)}
 
-  /* ── TABS ────────────────────────────────────────────────── */
-  .tabs-bar {
-    background: var(--forest-mid);
-    border-bottom: 1px solid var(--forest-border);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-  .tabs-inner { max-width: 1000px; margin: 0 auto; display: flex; }
-  .tab-btn {
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: #5A7A5A;
-    padding: 15px 22px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: var(--serif);
-    letter-spacing: 0.02em;
-    transition: color 0.2s, border-color 0.2s;
-    white-space: nowrap;
-  }
-  .tab-btn.active {
-    color: #D4E8D4;
-    border-bottom-color: var(--sage);
-  }
-  .tab-btn:hover { color: #9EC4A0; }
+/* CARD TOP — always visible */
+.card-top{padding:18px 20px 16px;cursor:pointer;user-select:none}
+.card-top-row1{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.card-title{font-family:var(--serif);font-size:16px;font-weight:700;flex:1}
+.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+.badge{font-size:11px;padding:2px 9px;border-radius:12px;font-family:var(--mono)}
+.card-right{text-align:right;flex-shrink:0}
+.hrs{font-family:var(--serif);font-size:15px;font-weight:700}
+.hrs-l{font-family:var(--mono);font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.08em}
+.chev{font-size:13px;color:#BBB;margin-top:5px;transition:transform .2s;display:block}
+.card.open .chev{transform:rotate(180deg)}
 
-  /* ── MAIN ────────────────────────────────────────────────── */
-  .main { max-width: 1000px; margin: 0 auto; padding: 28px 24px 60px; }
+/* ALWAYS-VISIBLE SUMMARY */
+.card-summary{padding:0 20px 14px 42px}
+.card-desc{font-size:13px;color:var(--text-mid);font-style:italic;margin-bottom:10px;line-height:1.6}
+.features{display:flex;flex-wrap:wrap;gap:6px}
+.feat-tag{font-size:11px;font-family:var(--mono);padding:3px 10px;border-radius:20px;background:var(--cream-dark);color:var(--text-mid)}
 
-  /* ── CATEGORY FILTERS ────────────────────────────────────── */
-  .filter-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
-  .filter-btn {
-    padding: 7px 16px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    color: var(--text-mid);
-    font-size: 13px;
-    cursor: pointer;
-    font-family: var(--body);
-    transition: all 0.18s;
-  }
-  .filter-btn:hover { border-color: #999; }
-  .filter-btn.active-filter {
-    color: #fff;
-    border-color: transparent;
-  }
+/* LINKS ROW */
+.links-row{display:flex;gap:10px;flex-wrap:wrap;padding:0 20px 14px 42px}
+.link-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);padding:5px 13px;border-radius:8px;border:1.5px solid;text-decoration:none;transition:all .18s;cursor:pointer}
+.link-btn:hover{opacity:.8}
+.link-btn.primary{color:#fff}
+.link-btn.secondary{background:transparent}
 
-  /* ── ITEM CARDS ──────────────────────────────────────────── */
-  .items-list { display: flex; flex-direction: column; gap: 12px; }
-  .item-card {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .item-card.open { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
-  .item-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 18px 20px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .item-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    margin-top: 6px;
-    flex-shrink: 0;
-  }
-  .item-meta { flex: 1; }
-  .item-title-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 5px;
-  }
-  .item-title {
-    font-family: var(--serif);
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .badge {
-    font-size: 11px;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-family: var(--mono);
-  }
-  .item-desc-preview {
-    font-size: 13px;
-    color: var(--text-light);
-    font-style: italic;
-  }
-  .item-right {
-    text-align: right;
-    flex-shrink: 0;
-  }
-  .hours-value {
-    font-family: var(--serif);
-    font-size: 15px;
-    font-weight: 700;
-  }
-  .hours-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-light);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .chevron {
-    font-size: 14px;
-    color: #BBB;
-    margin-top: 6px;
-    transition: transform 0.2s;
-  }
-  .open .chevron { transform: rotate(180deg); }
+/* EXPANDED DETAIL */
+.card-detail{border-top:1px solid var(--cream-dark);padding:18px 20px 20px 42px;background:#FAFAF7;display:none}
+.card.open .card-detail{display:block}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px}
+@media(max-width:600px){.detail-grid{grid-template-columns:1fr}}
+.dl-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.18em;font-weight:500;margin-bottom:9px}
+.dl-row{font-size:13px;color:#3A322A;padding:5px 0;border-bottom:1px dotted var(--border);display:flex;gap:8px;align-items:flex-start}
+.dl-row:last-child{border-bottom:none}
+.dl-icon{flex-shrink:0;margin-top:1px}
+.card-foot{display:flex;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--text-light);font-style:italic;margin-top:6px}
 
-  /* ── EXPANDED DETAIL ─────────────────────────────────────── */
-  .item-detail {
-    border-top: 1px solid var(--cream-dark);
-    padding: 20px 20px 22px 44px;
-    background: #FAFAF7;
-    display: none;
-  }
-  .open .item-detail { display: block; }
-  .item-full-desc {
-    font-size: 14px;
-    line-height: 1.7;
-    color: #3A322A;
-    margin-bottom: 20px;
-  }
-  .detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 18px;
-  }
-  @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
-  .detail-section-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-weight: 500;
-    margin-bottom: 10px;
-  }
-  .detail-row {
-    font-size: 13px;
-    color: #3A322A;
-    padding: 5px 0;
-    border-bottom: 1px dotted var(--border);
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-  .detail-row-icon { flex-shrink: 0; margin-top: 1px; }
-  .item-footer {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    font-size: 13px;
-    color: var(--text-light);
-    font-style: italic;
-    margin-top: 4px;
-  }
+/* IMPACT */
+.imp-card{background:var(--white);border-radius:12px;padding:20px 24px;margin-bottom:14px;border:1.5px solid var(--border)}
+.imp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.imp-cat{font-family:var(--serif);font-size:16px;font-weight:700}
+.imp-hrs{font-family:var(--serif);font-size:24px;font-weight:700}
+.pbar{height:8px;background:var(--cream-dark);border-radius:4px;overflow:hidden;margin-bottom:12px}
+.pfill{height:100%;border-radius:4px;transition:width .8s ease}
+.imp-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dotted var(--border);color:var(--text-mid)}
+.imp-row:last-child{border-bottom:none}
+.imp-total{background:var(--forest);color:#E8E0CC;border-radius:12px;padding:26px 30px;margin-top:20px}
+.tot-l{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:7px}
+.tot-v{font-family:var(--serif);font-size:44px;font-weight:700;color:var(--gold)}
+.tot-note{color:#A09880;font-size:14px;font-style:italic;margin-top:9px;line-height:1.6}
 
-  /* ── IMPACT TAB ──────────────────────────────────────────── */
-  .impact-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 14px;
-    border: 1.5px solid var(--border);
-  }
-  .impact-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-  }
-  .impact-cat-name { font-family: var(--serif); font-size: 16px; font-weight: 700; }
-  .impact-hours { font-family: var(--serif); font-size: 24px; font-weight: 700; }
-  .progress-bar {
-    height: 8px;
-    background: var(--cream-dark);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 14px;
-  }
-  .progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.8s ease;
-  }
-  .impact-rows { }
-  .impact-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    padding: 5px 0;
-    border-bottom: 1px dotted var(--border);
-    color: var(--text-mid);
-  }
-  .impact-row:last-child { border-bottom: none; }
-  .impact-total {
-    background: var(--forest);
-    color: #E8E0CC;
-    border-radius: 12px;
-    padding: 26px 30px;
-    margin-top: 20px;
-  }
-  .total-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin-bottom: 8px;
-  }
-  .total-value { font-family: var(--serif); font-size: 44px; font-weight: 700; color: var(--gold); }
-  .total-note { color: #A09880; font-size: 14px; font-style: italic; margin-top: 10px; line-height: 1.6; }
+/* ROADMAP */
+.roadmap-intro{background:var(--white);border-radius:12px;padding:18px 22px;margin-bottom:20px;border:1.5px solid var(--border);display:flex;gap:20px;flex-wrap:wrap}
+.priority-key{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.pk-item{display:flex;align-items:center;gap:7px;font-size:12px;font-family:var(--mono)}
+.pk-dot{width:12px;height:12px;border-radius:50%}
+.rm-section{margin-bottom:20px}
+.rm-section-hdr{font-family:var(--serif);font-size:14px;font-weight:700;padding:10px 16px;border-radius:8px 8px 0 0;color:#fff;display:flex;align-items:center;gap:10px}
+.rm-items{background:var(--white);border:1.5px solid var(--border);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.rm-item{display:flex;align-items:flex-start;gap:14px;padding:12px 18px;border-bottom:1px solid var(--cream-dark)}
+.rm-item:last-child{border-bottom:none}
+.priority-badge{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:12px;white-space:nowrap;flex-shrink:0;margin-top:2px;text-transform:uppercase;letter-spacing:.08em}
+.rm-text{flex:1}
+.rm-project{font-size:11px;font-family:var(--mono);font-weight:500;margin-bottom:2px}
+.rm-desc{font-size:13px;color:#3A322A}
 
-  /* ── IMPROVEMENTS TAB ────────────────────────────────────── */
-  .improve-card {
-    background: var(--white);
-    border-radius: 12px;
-    margin-bottom: 16px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-  }
-  .improve-header {
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .improve-header-text { color: #fff; font-family: var(--serif); font-size: 15px; font-weight: 700; }
-  .improve-count { color: rgba(255,255,255,0.55); font-size: 12px; font-family: var(--mono); }
-  .improve-body { padding: 16px 20px; }
-  .improve-item {
-    display: flex;
-    gap: 12px;
-    padding: 9px 0;
-    border-bottom: 1px dotted var(--border);
-  }
-  .improve-item:last-child { border-bottom: none; }
-  .improve-arrow {
-    width: 22px; height: 22px;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .improve-project { font-size: 11px; font-weight: 700; font-family: var(--mono); margin-bottom: 2px; }
-  .improve-text { font-size: 13px; color: #3A322A; }
+/* SECTION LABELS */
+.sec-title{font-family:var(--serif);font-size:22px;margin-bottom:5px}
+.sec-sub{color:var(--text-light);font-size:14px;font-style:italic;margin-bottom:26px}
 
-  /* ── SECTION HEADINGS ────────────────────────────────────── */
-  .section-title { font-family: var(--serif); font-size: 22px; margin-bottom: 6px; }
-  .section-sub { color: var(--text-light); font-size: 14px; font-style: italic; margin-bottom: 28px; }
+/* TAB PANELS */
+.panel{display:none}.panel.on{display:block}
 
-  /* ── FOOTER ──────────────────────────────────────────────── */
-  .footer {
-    text-align: center;
-    padding: 20px;
-    color: var(--text-light);
-    font-size: 12px;
-    font-style: italic;
-    font-family: var(--serif);
-    border-top: 1px solid var(--border);
-    margin-top: 20px;
-  }
-
-  /* ── TAB PANELS ──────────────────────────────────────────── */
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  /* ── ANIMATIONS ──────────────────────────────────────────── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .item-card { animation: fadeUp 0.3s ease both; }
+/* FOOTER */
+.footer{text-align:center;padding:20px;color:var(--text-light);font-size:12px;font-style:italic;font-family:var(--serif);border-top:1px solid var(--border);margin-top:20px}
 </style>
 </head>
 <body>
 
-<!-- ── HEADER ─────────────────────────────────────────── -->
-<div class="header">
-  <div class="header-inner">
-    <div class="header-eyebrow">Personal Operations Hub · Julian Johnson</div>
-    <h1 class="header-title">Master Inventory</h1>
-    <p class="header-subtitle">Every tool, website, and system built together — with improvement roadmap and impact tracking.</p>
-    <div class="stats-row" id="statsRow">
-      <!-- populated by JS -->
-    </div>
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="eyebrow">Personal Operations Hub · Julian Johnson</div>
+    <h1>Master Inventory</h1>
+    <p>Every tool, website, and system built together — with links, key features, and a prioritized improvement roadmap.</p>
+    <div class="stats" id="statsRow"></div>
   </div>
 </div>
 
-<!-- ── TABS ────────────────────────────────────────────── -->
-<div class="tabs-bar">
-  <div class="tabs-inner">
-    <button class="tab-btn active" onclick="switchTab('overview', this)">📋 All Projects</button>
-    <button class="tab-btn" onclick="switchTab('impact', this)">⚡ Impact Summary</button>
-    <button class="tab-btn" onclick="switchTab('improvements', this)">🔧 Improvement Queue</button>
+<div class="tabs">
+  <div class="tabs-in">
+    <button class="tb on" onclick="switchTab('overview',this)">📋 All Projects</button>
+    <button class="tb" onclick="switchTab('impact',this)">⚡ Impact Summary</button>
+    <button class="tb" onclick="switchTab('roadmap',this)">🗺 Improvement Roadmap</button>
   </div>
 </div>
 
-<!-- ── MAIN ─────────────────────────────────────────────── -->
 <div class="main">
-
-  <!-- OVERVIEW TAB -->
-  <div class="tab-panel active" id="tab-overview">
-    <div class="filter-row" id="filterRow"></div>
-    <div class="items-list" id="itemsList"></div>
+  <div class="panel on" id="tab-overview">
+    <div class="filters" id="filterRow"></div>
+    <div class="cards" id="cardList"></div>
   </div>
-
-  <!-- IMPACT TAB -->
-  <div class="tab-panel" id="tab-impact">
-    <h2 class="section-title">Cumulative Impact Summary</h2>
-    <p class="section-sub">Estimated hours saved or generated across all projects. Recurring savings from automated tools compound annually.</p>
+  <div class="panel" id="tab-impact">
+    <h2 class="sec-title">Cumulative Impact Summary</h2>
+    <p class="sec-sub">Estimated hours saved or generated. Recurring savings from automated tools compound annually.</p>
     <div id="impactContent"></div>
   </div>
-
-  <!-- IMPROVEMENTS TAB -->
-  <div class="tab-panel" id="tab-improvements">
-    <h2 class="section-title">Improvement Opportunity Queue</h2>
-    <p class="section-sub">All suggested next-step improvements, organized by area. Bring any item here and we can build or refine it together.</p>
-    <div id="improvementsContent"></div>
+  <div class="panel" id="tab-roadmap">
+    <h2 class="sec-title">Prioritized Improvement Roadmap</h2>
+    <p class="sec-sub">Every queued improvement ranked by impact. Bring any item here and we build it together.</p>
+    <div id="roadmapContent"></div>
   </div>
-
 </div>
 
 <div class="footer" id="footer"></div>
 
 <script>
-// ──────────────────────────────────────────────────────────
-// DATA
-// ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const LAST_UPDATED = "June 2026";
 
-const LAST_UPDATED = "May 2026";
-
-const CATEGORIES = [
-  { id: "quiet-edge", label: "The Quiet Edge",      color: "#2E7D52", light: "#E8F5EE", icon: "🏆" },
-  { id: "unified",    label: "Unified Solutions",   color: "#1C3A5A", light: "#E6EDF5", icon: "🎯" },
-  { id: "personal",   label: "Personal & Financial",color: "#7B4F2E", light: "#F5EDE6", icon: "🏠" },
-  { id: "trading",    label: "Trading & Investing", color: "#1A5C5C", light: "#E6F2F2", icon: "📈" },
-  { id: "content",    label: "Content & Brand",     color: "#5C2E7A", light: "#EFE6F5", icon: "✍️" },
+const CATS = [
+  {id:"quiet-edge", label:"The Quiet Edge",       color:"#2E7D52", light:"#E8F5EE", icon:"🏆"},
+  {id:"unified",    label:"Unified Solutions",    color:"#1C3A5A", light:"#E6EDF5", icon:"🎯"},
+  {id:"personal",   label:"Personal & Financial", color:"#7B4F2E", light:"#F5EDE6", icon:"🏠"},
+  {id:"trading",    label:"Trading & Investing",  color:"#1A5C5C", light:"#E6F2F2", icon:"📈"},
+  {id:"content",    label:"Content & Brand",      color:"#5C2E7A", light:"#EFE6F5", icon:"✍️"},
 ];
 
 const STATUS = {
-  live:        { label: "Live",                  bg: "#D1FAE5", color: "#065F46" },
-  built:       { label: "Built / Ready to Deploy", bg: "#DBEAFE", color: "#1E40AF" },
-  complete:    { label: "Complete",              bg: "#EDE9FE", color: "#5B21B6" },
-  "in-progress":{ label: "In Progress",         bg: "#FEF3C7", color: "#92400E" },
-  ongoing:     { label: "Ongoing",              bg: "#FCE7F3", color: "#9D174D" },
+  live:         {label:"Live",                   bg:"#D1FAE5", color:"#065F46"},
+  built:        {label:"Built / Ready to Deploy",bg:"#DBEAFE", color:"#1E40AF"},
+  complete:     {label:"Complete",               bg:"#EDE9FE", color:"#5B21B6"},
+  "in-progress":{label:"In Progress",            bg:"#FEF3C7", color:"#92400E"},
+  ongoing:      {label:"Ongoing",                bg:"#FCE7F3", color:"#9D174D"},
 };
 
+// Priority: 1=High (do now), 2=Medium (next sprint), 3=Low (backlog)
+const P = {
+  1:{label:"High Priority", bg:"#FEE2E2", color:"#991B1B"},
+  2:{label:"Medium",        bg:"#FEF3C7", color:"#92400E"},
+  3:{label:"Backlog",       bg:"#F3F4F6", color:"#6B7280"},
+};
+
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
 const ITEMS = [
-  // ── THE QUIET EDGE ───────────────────────────────────────
+
+  // ── THE QUIET EDGE ──────────────────────────
   {
     id:"qe-curriculum", category:"quiet-edge",
     title:"Mental Performance Video Curriculum",
     type:"Content Library", status:"active",
-    description:"3-stage curriculum (Stages 1–3 complete) with 10 videos per stage. Each video has both an Athlete and Parent version. Includes two-part scripts, power arc conclusions, YouTube descriptions, and call-to-action scripts. Grounded in sports psychology research (Dorsch, Côté, Deci & Ryan).",
-    outputs:["Stage 1–3: 30 videos × 2 versions = 60 scripts — complete","YouTube descriptions for each video","Listening Plan CTA script","Stage-by-stage research citations"],
-    timeSaved:120, timeSavedUnit:"hours of scripting",
-    improvements:["Convert top-performing scripts into short-form Reels/TikTok","Build a quarterly content calendar to stagger releases","Add Stage 4 scripting when ready","Create a 'Best Of' highlight reel for each stage"],
-    links:[], lastWorked:"Feb 2026",
+    description:"3-stage curriculum with 10 videos per stage, each in Athlete and Parent versions. Full scripts, YouTube descriptions, and CTAs grounded in sports psychology research.",
+    features:["60 total scripts (30 videos × 2 versions)","Stage 1–3 complete","YouTube descriptions per video","Listening Plan CTA script","Research citations (Dorsch, Côté, Deci & Ryan)"],
+    links:[],
+    outputs:["Stage 1–3 scripts complete","YouTube descriptions","Listening Plan CTA"],
+    improvements:[
+      {text:"Convert top scripts into short-form Reels / TikTok", p:1},
+      {text:"Build a quarterly content calendar to stagger releases", p:1},
+      {text:"Script Stage 4 when ready", p:2},
+      {text:"Create a 'Best Of' highlight reel per stage", p:3},
+    ],
+    timeSaved:120, timeSavedUnit:"hours of scripting", lastWorked:"Feb 2026",
   },
   {
     id:"qe-co-parenting", category:"quiet-edge",
-    title:"Co-Parenting Through Youth Sports — Interactive Assessment",
+    title:"Co-Parenting Through Youth Sports — Assessment",
     type:"Web Tool", status:"live",
-    description:"Full self-contained HTML web app for separated/divorced parents navigating co-parenting in youth sports. Includes Co-Parenting Model Assessment, Warning Signs Checklist, Communication Protocols, Decision Frameworks, and personalized 4-week action plans.",
-    outputs:["GitHub Pages–ready HTML app","README + folder structure","Personalized action plan engine","Research-grounded recommendations"],
-    timeSaved:40, timeSavedUnit:"hours of tool development",
-    improvements:["Add email capture for lead gen into Notion CRM","Connect Google Analytics to track tool completions","Build mobile-optimized version","Add video embed linking to relevant curriculum modules"],
-    links:["GitHub Pages"], lastWorked:"Feb 2026",
+    description:"Self-contained HTML web app for separated/divorced parents navigating co-parenting in youth sports. Personalized 4-week action plans based on assessment results.",
+    features:["Co-Parenting Model Assessment","Warning Signs Checklist","Communication Protocol guides","Decision Frameworks","Personalized 4-week action plan engine","GitHub Pages hosted"],
+    links:[
+      {label:"View Live Tool", url:"#", primary:true, note:"Update with your GitHub Pages URL"},
+      {label:"GitHub Repo", url:"#", primary:false},
+    ],
+    outputs:["GitHub Pages HTML app","Personalized action plan engine","Research-grounded recommendations"],
+    improvements:[
+      {text:"Add email capture connected to Notion CRM for lead gen", p:1},
+      {text:"Add Google Analytics to track completions", p:1},
+      {text:"Link relevant video curriculum modules from within tool", p:2},
+      {text:"Build mobile-optimized version", p:2},
+    ],
+    timeSaved:40, timeSavedUnit:"hours of tool development", lastWorked:"Feb 2026",
   },
   {
     id:"qe-multi-child", category:"quiet-edge",
-    title:"Multi-Child Family Navigator — Interactive Assessment",
+    title:"Multi-Child Family Navigator — Assessment",
     type:"Web Tool", status:"live",
-    description:"Interactive HTML tool for parents of multiple young athletes. Covers sibling dynamics, comparison patterns, scenario-specific guidance (6 major multi-child challenges), and research-based action plans grounded in Côté, Davis & Meyer, Hopwood, and Sulloway.",
-    outputs:["GitHub Pages–ready HTML app","6-scenario library (same sport, quitting, birth order surpass, resource imbalance, schedule conflicts, toxic comparison)","Research citations per recommendation"],
-    timeSaved:35, timeSavedUnit:"hours of tool development",
-    improvements:["A/B test different intake flows","Add completion rate tracking via analytics","Link to relevant video curriculum segments","Create a co-use companion guide for the two assessment tools"],
-    links:["GitHub Pages"], lastWorked:"Feb 2026",
+    description:"Interactive tool for parents of multiple young athletes covering sibling dynamics, comparison patterns, and 6 scenario-specific guidance frameworks grounded in peer-reviewed research.",
+    features:["6-scenario library (same sport, quitting, birth order, resource imbalance, scheduling, toxic comparison)","Research-based action plans","Côté, Hopwood, Sulloway frameworks","GitHub Pages hosted"],
+    links:[
+      {label:"View Live Tool", url:"#", primary:true, note:"Update with your GitHub Pages URL"},
+      {label:"GitHub Repo", url:"#", primary:false},
+    ],
+    outputs:["GitHub Pages HTML app","6-scenario library","Research citations per recommendation"],
+    improvements:[
+      {text:"Add completion rate tracking via Google Analytics", p:1},
+      {text:"Create co-use companion guide linking both assessment tools", p:2},
+      {text:"A/B test different intake flows", p:2},
+      {text:"Link to relevant video curriculum segments", p:3},
+    ],
+    timeSaved:35, timeSavedUnit:"hours of tool development", lastWorked:"Feb 2026",
   },
   {
     id:"qe-landing", category:"quiet-edge",
     title:"The Quiet Edge Workshop Landing Page",
     type:"Web Page", status:"built",
-    description:"Full-featured HTML landing page in premium navy/teal/gold palette designed for club director outreach campaigns. Playfair Display / DM Sans typography. All sections complete.",
-    outputs:["Full HTML page with hero, features, testimonials, CTA","Mobile responsive","Premium brand-aligned design"],
-    timeSaved:8, timeSavedUnit:"hours of design & dev",
-    improvements:["Deploy to GitHub Pages or Netlify","Add Calendly booking embed","Connect to email list (Mailchimp / ConvertKit)","Test with 6 club director outreach emails as a campaign pilot"],
-    links:[], lastWorked:"Mar 2026",
+    description:"Full-featured HTML landing page in premium navy/teal/gold palette designed for club director outreach campaigns. Mobile responsive. Ready to deploy.",
+    features:["All sections complete (hero, features, testimonials, CTA)","Mobile responsive","Playfair Display / DM Sans typography","Club director–focused copy"],
+    links:[
+      {label:"Deploy to GitHub Pages", url:"#", primary:true, note:"Not yet deployed — file ready"},
+    ],
+    outputs:["Full HTML landing page","Mobile responsive","Brand-aligned design"],
+    improvements:[
+      {text:"Deploy to GitHub Pages or Netlify", p:1},
+      {text:"Add Calendly booking embed", p:1},
+      {text:"Connect to email list (Mailchimp / ConvertKit)", p:2},
+      {text:"Pilot with 6 club director outreach emails", p:2},
+    ],
+    timeSaved:8, timeSavedUnit:"hours of design and dev", lastWorked:"Mar 2026",
   },
   {
     id:"qe-instagram", category:"quiet-edge",
     title:"Instagram Carousel — Parent Resources",
     type:"Social Content", status:"complete",
-    description:"10-slide carousel with full copy, design direction (1080×1350px), and hashtag strategy. Drives traffic to the two assessment tools and The Quiet Edge Stage 1 parent audio.",
-    outputs:["10-slide carousel copy + design spec","Caption with all resource short links","Hashtag set","Content pillar rationale"],
-    timeSaved:4, timeSavedUnit:"hours of content creation",
-    improvements:["Turn into a reusable Canva template","Create athlete-version carousel","Schedule quarterly content batches","Track which slides drive the most tool traffic"],
-    links:[], lastWorked:"Feb 2026",
+    description:"10-slide carousel with full copy, design direction, and hashtag strategy. Drives traffic to both assessment tools and the Stage 1 parent audio.",
+    features:["10-slide copy + design spec (1080×1350px)","Caption with resource short links","Hashtag set","Content pillar rationale"],
+    links:[],
+    outputs:["10-slide carousel","Caption + hashtags","Design spec"],
+    improvements:[
+      {text:"Build as a reusable Canva template for recurring use", p:2},
+      {text:"Create athlete-version carousel", p:2},
+      {text:"Track which slides drive most tool traffic", p:3},
+    ],
+    timeSaved:4, timeSavedUnit:"hours of content creation", lastWorked:"Feb 2026",
   },
   {
     id:"qe-positioning", category:"quiet-edge",
     title:"Competitive Positioning Analysis",
     type:"Strategy Document", status:"complete",
-    description:"Analysis of the competitive landscape for The Quiet Edge mental performance platform and recommended future-focused differentiation angles.",
-    outputs:["Competitor landscape map","Differentiation framework","Future-focused positioning angles"],
-    timeSaved:6, timeSavedUnit:"hours of research",
-    improvements:["Refresh annually as new competitors emerge","Turn into a one-pager for sales conversations","Build a prospect-facing FAQ from the differentiation points"],
-    links:[], lastWorked:"Jan 2026",
+    description:"Competitive landscape analysis for The Quiet Edge mental performance platform with recommended differentiation angles and future-focused positioning.",
+    features:["Competitor landscape map","Differentiation framework","Future-focused positioning angles","Prospect-facing FAQ outline"],
+    links:[],
+    outputs:["Competitor map","Differentiation framework","Positioning angles"],
+    improvements:[
+      {text:"Refresh annually as new competitors emerge", p:2},
+      {text:"Turn into a one-pager for sales conversations", p:2},
+    ],
+    timeSaved:6, timeSavedUnit:"hours of research", lastWorked:"Jan 2026",
   },
 
-  // ── UNIFIED SOLUTIONS ────────────────────────────────────
+  // ── UNIFIED SOLUTIONS ────────────────────────
   {
     id:"us-assessment", category:"unified",
     title:"Leadership Pressure Point Assessment",
     type:"Interactive Tool", status:"live",
-    description:"18-question research-grounded assessment scoring 6 leadership domains: Identity & Presence, Decision Quality, Relational Intelligence, Team Vitality, Personal Sustainability, and Strategic Clarity. Identifies primary and secondary pressure points with personalized debrief content and email lead capture connected to Notion CRM.",
-    outputs:["Full interactive assessment widget","6-domain scoring engine","Personalized debrief content per domain","Email opt-in with Notion CRM + Gmail alert integration","PIN-protected admin dashboard"],
-    timeSaved:50, timeSavedUnit:"hours of research + build",
-    improvements:["Add PDF export of personalized results","Build benchmarking database as submissions accumulate","Create a team/group version with aggregate scoring","Add a follow-up email sequence triggered by pressure point"],
-    links:["unifiedsolutionsinc.com/resources"], lastWorked:"Apr 2026",
+    description:"18-question assessment scoring 6 leadership domains with personalized debrief content and email lead capture connected to Notion CRM and Gmail alerts.",
+    features:["18 questions across 6 domains","Personalized debrief per pressure point","Email opt-in with lead capture","Notion CRM auto-record creation","Gmail new lead alert","PIN-protected admin dashboard"],
+    links:[
+      {label:"View Live Assessment", url:"https://unifiedsolutionsinc.com/resources", primary:true},
+      {label:"Notion CRM", url:"#", primary:false, note:"Add your Notion DB link"},
+    ],
+    outputs:["Interactive assessment widget","6-domain scoring engine","Personalized debrief content","Assessment → CRM pipeline"],
+    improvements:[
+      {text:"Add PDF export of personalized results", p:1},
+      {text:"Add automated follow-up email sequence per pressure point", p:1},
+      {text:"Create a team/group version with aggregate scoring", p:2},
+      {text:"Build benchmarking database as submissions accumulate", p:2},
+    ],
+    timeSaved:50, timeSavedUnit:"hours of research and build", lastWorked:"Apr 2026",
   },
   {
     id:"us-debrief-guide", category:"unified",
     title:"Assessment Debrief Practitioner Guide",
     type:"Reference Document", status:"complete",
-    description:"7-section HTML debrief guide. Includes score tier interpretation table (5 tiers), 6 domain cards with ready-to-use debrief questions, domain interrelationship map, 6 common domain pairings, 12 articles + 12 books mapped by domain, and debrief posture guidance per score tier.",
-    outputs:["Print-ready HTML guide","Score tier table (5 tiers)","Domain question bank (3 questions × 6 domains)","Domain interrelationship map","External resource library"],
-    timeSaved:20, timeSavedUnit:"hours of curation and writing",
-    improvements:["Build a 1-page quick-reference card version","Create a Notion page for easy updates as new articles are added","Add video content recommendations per domain"],
-    links:[], lastWorked:"Apr 2026",
+    description:"7-section HTML debrief guide for practitioners. Score tier interpretation, domain debrief question banks, interrelationship map, and curated resource library.",
+    features:["Score tier table (5 tiers)","Domain question bank (3 questions × 6 domains)","Domain interrelationship map","12 articles + 12 books mapped by domain","Common domain pairings guide","Debrief posture guidance per tier"],
+    links:[
+      {label:"Open Guide", url:"#", primary:true, note:"Add your hosted URL or local file path"},
+    ],
+    outputs:["Print-ready HTML guide","Score tier table","Question bank","Resource library"],
+    improvements:[
+      {text:"Build a 1-page quick-reference card version", p:1},
+      {text:"Create a Notion page for easy updates as new articles are added", p:2},
+      {text:"Add video content recommendations per domain", p:3},
+    ],
+    timeSaved:20, timeSavedUnit:"hours of curation and writing", lastWorked:"Apr 2026",
   },
   {
     id:"us-website", category:"unified",
-    title:"Unified Solutions Website Redesign (5 Pages)",
+    title:"Unified Solutions Website (5 Pages)",
     type:"Website", status:"built",
-    description:"Complete 5-page website redesign: Home, About, Coaching, Resources, Book. Navy/olive/cream brand palette with full copy, testimonials, assessment CTA integration, and assessment toolkit section. Nav injected via shared JS. Ready to deploy.",
-    outputs:["index.html, about.html, coaching.html, resources.html, book.html","style.css (shared)","nav.js (auto-injects nav + footer across all pages)","Full copywriting for all sections"],
-    timeSaved:30, timeSavedUnit:"hours of design + copywriting",
-    improvements:["Deploy to production (replace current site)","Add headshot photo to about.html","Embed Calendly on book.html","Embed assessment widget on resources.html","Add Google Analytics"],
-    links:["unifiedsolutionsinc.com"], lastWorked:"Apr 2026",
+    description:"Complete 5-page website redesign with navy/olive/cream brand palette, full copywriting, testimonials, and assessment CTA integration. Ready to deploy.",
+    features:["5 pages: Home, About, Coaching, Resources, Book","Shared style.css + nav.js (auto-injects nav across all pages)","Full copywriting","Assessment toolkit section","Testimonials","Mobile responsive"],
+    links:[
+      {label:"Current Site", url:"https://unifiedsolutionsinc.com", primary:true},
+      {label:"Redesign Files", url:"#", primary:false, note:"Add GitHub repo link"},
+    ],
+    outputs:["index.html, about.html, coaching.html, resources.html, book.html","style.css","nav.js"],
+    improvements:[
+      {text:"Deploy redesign to replace current site", p:1},
+      {text:"Embed Calendly on book.html", p:1},
+      {text:"Embed assessment widget on resources.html", p:1},
+      {text:"Add Google Analytics", p:2},
+      {text:"Add headshot photo to about.html", p:2},
+    ],
+    timeSaved:30, timeSavedUnit:"hours of design and copywriting", lastWorked:"Apr 2026",
   },
   {
     id:"us-crm", category:"unified",
     title:"Coaching Contacts CRM — Notion + Gmail",
     type:"Automated System", status:"live",
-    description:"Notion CRM database ('Coaching Contacts — Unified Solutions CRM') connected to the Leadership Pressure Point Assessment. New opt-ins auto-create a Notion record with all 6 domain scores, trigger a Gmail draft notification, and back up to persistent storage.",
-    outputs:["Notion database (15 fields)","Auto-record creation on assessment opt-in","Gmail draft alert per new lead","Persistent storage backup","Assessment → CRM pipeline"],
-    timeSaved:15, timeSavedUnit:"hours of CRM setup + automation",
-    improvements:["Add automated follow-up email sequence per pressure point","Build monthly lead summary digest","Sync Calendly booking status back to Notion","Add a 'last contacted' reminder workflow"],
-    links:["Notion CRM","unifiedsolutionsinc.com assessment"], lastWorked:"Apr 2026",
+    description:"Notion CRM database connected to the Leadership Pressure Point Assessment. New opt-ins auto-create a Notion record with all 6 domain scores and trigger a Gmail draft notification.",
+    features:["Notion database with 15 fields","Auto-record creation on assessment opt-in","All 6 domain scores captured per lead","Gmail draft alert per new lead","Persistent storage backup"],
+    links:[
+      {label:"Open Notion CRM", url:"#", primary:true, note:"Add your Notion DB link"},
+    ],
+    outputs:["Notion database","Assessment → CRM pipeline","Gmail alert automation"],
+    improvements:[
+      {text:"Add automated follow-up email sequence per pressure point", p:1},
+      {text:"Sync Calendly booking status back to Notion", p:2},
+      {text:"Build monthly lead summary digest email", p:2},
+      {text:"Add 'last contacted' reminder workflow", p:3},
+    ],
+    timeSaved:15, timeSavedUnit:"hours of CRM setup and automation", lastWorked:"Apr 2026",
   },
   {
     id:"us-govcon", category:"unified",
     title:"GovCon Command Center",
     type:"Interactive Dashboard", status:"built",
-    description:"5-tab React dashboard for federal contracting pipeline management. Tabs: Opportunity Queue (SAM.gov intake), Contact Tracker, Outreach Log with templates, Capabilities Summary, and compliance metrics. Pre-loaded with SDVOSB-aligned demo opportunities and contacts.",
-    outputs:["React JSX dashboard","Opportunity scoring engine (match score logic)","Outreach template library","SDVOSB compliance indicators","Notion-ready data structure"],
-    timeSaved:25, timeSavedUnit:"hours of research + build",
-    improvements:["Connect to live SAM.gov RSS feed for auto-import","Add win/loss tracking as opportunities close","Integrate with Notion workspace for persistent data","Build proposal deadline countdown alerts"],
-    links:[], lastWorked:"Apr 2026",
+    description:"5-tab dashboard for federal contracting pipeline management. Opportunity Queue, Contact Tracker, Outreach Log, Capabilities Summary, and compliance metrics with SDVOSB match logic.",
+    features:["Opportunity scoring engine","SAM.gov intake tab","SDVOSB compliance indicators","Outreach template library","Contact tracker","Proposal deadline view"],
+    links:[
+      {label:"Open Dashboard", url:"#", primary:true, note:"Add your hosted URL or local file path"},
+    ],
+    outputs:["React JSX dashboard","Opportunity scoring","Outreach template library"],
+    improvements:[
+      {text:"Connect to live SAM.gov RSS feed for auto-import", p:1},
+      {text:"Integrate with Notion for persistent data storage", p:1},
+      {text:"Add win/loss tracking as opportunities close", p:2},
+      {text:"Build proposal deadline countdown alerts", p:2},
+    ],
+    timeSaved:25, timeSavedUnit:"hours of research and build", lastWorked:"Apr 2026",
   },
   {
     id:"us-icf-tracker", category:"unified",
     title:"ICF Coaching Hours Sync Center",
     type:"Interactive Tool", status:"live",
-    description:"Browser-based sync tool reading live from your Google Sheet. De-duplicates across all firm channels. ExecOnline CSV batch importer, Torch session list, Ufacilitate manual entry. Dashboard shows PCC renewal progress and MCC pathway metrics in real time. 24/24 integrity checks pass.",
-    outputs:["HTML sync center","ExecOnline CSV dedup importer","Torch session batch importer (40+ sessions pre-loaded)","Live Google Sheet sync","PCC + MCC dashboard with progress bars","Credential security best-practices guide"],
-    timeSaved:20, timeSavedUnit:"hours/year of manual tracking",
-    improvements:["Add annual CCE planning view","Build automated renewal date countdown alerts","Export credential summary PDF for ICF submissions","Add supervisor coaching hour tracking"],
-    links:["Google Sheet (ICF tracker)"], lastWorked:"May 2026",
+    description:"Browser-based sync tool for ICF credential tracking. Reads live from Google Sheet, de-duplicates across all firm channels, and shows real-time PCC and MCC pathway progress.",
+    features:["Live Google Sheet sync","ExecOnline CSV batch importer","Torch session batch importer (40+ sessions)","PCC renewal progress dashboard","MCC pathway metrics","24/24 integrity checks"],
+    links:[
+      {label:"Open Sync Center", url:"#", primary:true, note:"Add your hosted file URL"},
+      {label:"ICF Google Sheet", url:"https://docs.google.com/spreadsheets/d/1AU6oTqKtiTbsweTC7x48-wt6b1WTW7sD0uR-i4Q_Ae0", primary:false},
+    ],
+    outputs:["HTML sync center","CSV importers","Live Google Sheet sync","PCC + MCC dashboard"],
+    improvements:[
+      {text:"Add annual CCE planning view", p:1},
+      {text:"Export credential summary PDF for ICF submissions", p:1},
+      {text:"Build automated renewal date countdown alerts", p:2},
+      {text:"Add supervisor coaching hour tracking", p:3},
+    ],
+    timeSaved:20, timeSavedUnit:"hours per year of manual tracking", lastWorked:"May 2026",
   },
   {
-    id:"us-succession-workshop", category:"unified",
+    id:"us-succession", category:"unified",
     title:"Non-Profit Succession Planning Workshop",
     type:"Facilitation Package", status:"complete",
-    description:"90-minute workshop for RI's 'Beyond the Handover: Human-Centered Succession Planning for Resilient Non-Profits' (June 18 confirmed). Full facilitation guide with stage-by-stage delivery notes, scenario tools, Social Styles framework, 'space-making' ritual, and capstone book/resource list.",
-    outputs:["Session outline (60 min presentation + 30 min Q&A)","Slide deck","Stage-by-stage facilitator delivery notes","Transition checklist + success markers","Recommended reading + resource list"],
-    timeSaved:12, timeSavedUnit:"hours of curriculum development",
-    improvements:["Build a reusable version for other nonprofit clients","Create a 1-page participant takeaway sheet","Record and repurpose as async content","Document as a repeatable offering for RI and similar orgs"],
-    links:[], lastWorked:"Apr 2026",
+    description:"90-minute workshop package for RI's 'Beyond the Handover' session (June 18). Full facilitation guide, slide deck, delivery notes, participant tools, and resource list.",
+    features:["Session outline (60 min + 30 min Q&A)","Stage-by-stage facilitator delivery notes","Social Styles framework integration","Transition checklist + success markers","Recommended reading list"],
+    links:[],
+    outputs:["Session outline","Slide deck","Facilitator notes","Transition checklist"],
+    improvements:[
+      {text:"Build reusable version for other nonprofit clients", p:1},
+      {text:"Create 1-page participant takeaway sheet", p:2},
+      {text:"Record and repurpose as async content", p:2},
+    ],
+    timeSaved:12, timeSavedUnit:"hours of curriculum development", lastWorked:"Apr 2026",
   },
   {
-    id:"us-team-portfolio", category:"unified",
+    id:"us-portfolio", category:"unified",
     title:"Team Coaching Portfolio PDF",
     type:"Professional Document", status:"complete",
-    description:"Professional PDF documenting ACTC-level team coaching engagements with ICF competency mapping. Covers Lawson Products (technology change leadership) and Cognizant LEAD (long-arc transformation coaching). Built for the ACTC application and proposal submissions.",
-    outputs:["Multi-page portfolio PDF","ICF competency evidence map","Engagement case studies (Lawson, Cognizant LEAD)","Assessment tools listed with certifications"],
-    timeSaved:10, timeSavedUnit:"hours of writing + formatting",
-    improvements:["Update after Navy Federal Oct 22 workshop","Add Emeritus engagement when confirmed","Create a 1-page exec summary version for proposals","Build a digital version for the Unified Solutions website"],
-    links:[], lastWorked:"Apr 2026",
+    description:"Professional PDF documenting ACTC-level team coaching engagements with ICF competency mapping. Covers Lawson Products and Cognizant LEAD engagements.",
+    features:["ICF competency evidence map","Engagement case studies (Lawson Products, Cognizant LEAD)","Assessment tools and certifications listed","ACTC application ready"],
+    links:[
+      {label:"Open Portfolio", url:"#", primary:true, note:"Add your PDF hosted link or Google Drive URL"},
+    ],
+    outputs:["Multi-page PDF","ICF competency map","Engagement case studies"],
+    improvements:[
+      {text:"Update after Navy Federal Oct 22 workshop", p:1},
+      {text:"Create 1-page exec summary version for proposals", p:2},
+      {text:"Add Emeritus engagement when confirmed", p:2},
+      {text:"Build digital version for Unified Solutions website", p:3},
+    ],
+    timeSaved:10, timeSavedUnit:"hours of writing and formatting", lastWorked:"Apr 2026",
   },
 
-  // ── PERSONAL & FINANCIAL ─────────────────────────────────
+  // ── PERSONAL & FINANCIAL ─────────────────────
   {
     id:"pf-rental", category:"personal",
     title:"Plymouth Home Rental Planner",
     type:"Interactive Tool", status:"live",
-    description:"Full rental planning suite for 13800 61st Ave N (est. value ~$635K, HELOC $605K @ 6.87%). Financial Analyzer, Scenario Planner (rent vs. sell vs. Airbnb), Timeline & Decision Roadmap, and Find Renters tab with employer outreach list for 12 Plymouth-area companies (UHG, Cargill, Medtronic, etc.).",
-    outputs:["index.html (full tool)","Cash flow analyzer (HELOC-calibrated)","Scenario comparison engine","Renter profile generator (auto-updates with rent slider)","12-company employer outreach tracker","GitHub Pages–ready"],
-    timeSaved:15, timeSavedUnit:"hours of financial modeling",
-    improvements:["Update HELOC rate as variable rate changes","Add capital gains tax calculator for the 'sell' scenario","Build a lease agreement prep checklist","Track actual rental inquiries and applications"],
-    links:["GitHub Pages"], lastWorked:"Apr 2026",
+    description:"Full rental planning suite for 13800 61st Ave N. Financial analyzer, scenario planner (rent vs. sell vs. Airbnb), and employer outreach tracker for 12 Plymouth-area companies.",
+    features:["Cash flow analyzer (HELOC-calibrated @ 6.87%)","Rent vs. sell vs. Airbnb scenario engine","Renter profile generator (updates with rent slider)","12-company employer outreach tracker","Timeline and decision roadmap","GitHub Pages hosted"],
+    links:[
+      {label:"Open Rental Planner", url:"#", primary:true, note:"Add your GitHub Pages URL"},
+    ],
+    outputs:["Full HTML tool","Cash flow analyzer","Scenario engine","Employer outreach tracker"],
+    improvements:[
+      {text:"Update HELOC rate as variable rate changes", p:1},
+      {text:"Add capital gains tax calculator for sell scenario", p:1},
+      {text:"Track actual rental inquiries and applications", p:2},
+      {text:"Build a lease agreement prep checklist", p:3},
+    ],
+    timeSaved:15, timeSavedUnit:"hours of financial modeling", lastWorked:"Apr 2026",
   },
   {
     id:"pf-debt", category:"personal",
     title:"Business Debt & Cash Flow Strategy",
     type:"Financial Consultation", status:"complete",
-    description:"Strategic payoff sequencing for 4 business debt accounts: US Bank Triple Cash ($1,874, expiring promo), US Bank ShieldPlus (0% APR / 18 months), primary bank business card ($1,837 @ 16.65%), SBA LOC ($31,989 @ 10%). Includes credit card comparison research (8 cards across 6 issuers).",
-    outputs:["Debt payoff sequencing plan","Credit card comparison table (8 options)","Balance transfer strategy","Lean season cash flow model"],
-    timeSaved:5, timeSavedUnit:"hours of financial research",
-    improvements:["Build a simple monthly debt paydown tracker tied to coaching income","Revisit SBA LOC payoff strategy as income grows","Add a net worth tracking dashboard"],
-    links:[], lastWorked:"Mar 2026",
+    description:"Strategic payoff sequencing for 4 business debt accounts with credit card comparison research and balance transfer strategy for lean season cash flow.",
+    features:["Debt payoff sequencing plan","Credit card comparison table (8 options across 6 issuers)","Balance transfer strategy","Lean season cash flow model","SBA LOC strategy ($31,989 @ 10%)"],
+    links:[],
+    outputs:["Payoff sequencing plan","Credit card comparison","Cash flow model"],
+    improvements:[
+      {text:"Build a monthly debt paydown tracker tied to coaching income", p:1},
+      {text:"Revisit SBA LOC payoff strategy as income grows", p:2},
+      {text:"Add net worth tracking dashboard", p:3},
+    ],
+    timeSaved:5, timeSavedUnit:"hours of financial research", lastWorked:"Mar 2026",
   },
   {
     id:"pf-fractional", category:"personal",
     title:"Fractional Executive Opportunity Playbook",
     type:"Interactive Dashboard", status:"complete",
-    description:"Prioritized action plan for fractional CPO/CHRO and advisory roles. React dashboard with role priority rankings (fit score, speed to revenue, trading-hour impact), 30-day sprint plan, and platform comparison (Catalant, Toptal, Expert360, Umbrex, etc.).",
-    outputs:["React JSX dashboard","Role fit scoring (7 roles ranked)","30-day sprint plan","Platform comparison table","Time-to-revenue estimates"],
-    timeSaved:8, timeSavedUnit:"hours of market research",
-    improvements:["Update with live platform rates quarterly","Track outreach activity directly in the dashboard","Add income projection as first clients are engaged"],
-    links:[], lastWorked:"Apr 2026",
+    description:"Prioritized action plan for fractional CPO/CHRO and advisory roles with role fit scoring, 30-day sprint plan, and platform comparison.",
+    features:["7 roles ranked by fit score and speed to revenue","30-day sprint plan","Platform comparison (Catalant, Toptal, Expert360, Umbrex, etc.)","Time-to-revenue estimates","Trading-hour impact scoring"],
+    links:[
+      {label:"Open Playbook", url:"#", primary:true, note:"Add your hosted URL or local file path"},
+    ],
+    outputs:["React JSX dashboard","Role fit scoring","30-day sprint plan","Platform comparison"],
+    improvements:[
+      {text:"Update platform rates quarterly", p:2},
+      {text:"Track outreach activity directly in the dashboard", p:2},
+      {text:"Add income projection as first clients are engaged", p:2},
+    ],
+    timeSaved:8, timeSavedUnit:"hours of market research", lastWorked:"Apr 2026",
   },
 
-  // ── TRADING & INVESTING ──────────────────────────────────
+  // ── TRADING & INVESTING ──────────────────────
   {
     id:"tr-ninjatrader", category:"trading",
     title:"NinjaTrader ICT-Apex Scalper Strategy",
     type:"Trading Algorithm", status:"in-progress",
-    description:"Full conversion of a Pine Script (TradingView) multi-timeframe ICT strategy to NinjaTrader C# strategy code. Includes EMA/ATR/RSI indicators, swing high/low detection, order block logic, FVG sensitivity, session time filters, prop firm compliance panel (MyFunded), and display options.",
-    outputs:["NinjaTrader C# strategy file","Multi-timeframe ICT signal logic","Prop firm compliance panel","Configurable risk parameters","Swing high/low and order block detection"],
-    timeSaved:10, timeSavedUnit:"hours of conversion work",
-    improvements:["Backtest on 6–12 months of historical data before live deployment","Add a daily trade journal integration","Build a risk dashboard showing daily P&L vs. prop firm drawdown limits","Define and document specific session setups (London, NY open, etc.)"],
-    links:[], lastWorked:"Jul 2025",
+    description:"Full Pine Script to NinjaTrader C# conversion of a multi-timeframe ICT scalping strategy with prop firm compliance panel and configurable risk parameters.",
+    features:["Multi-timeframe ICT signal logic","EMA / ATR / RSI indicators","Swing high/low and order block detection","FVG sensitivity filter","Session time filters (London, NY open)","MyFunded prop firm compliance panel","Configurable risk parameters"],
+    links:[
+      {label:"Strategy Files", url:"#", primary:true, note:"Add your local NinjaTrader file path or repo link"},
+    ],
+    outputs:["NinjaTrader C# strategy file","Prop firm compliance panel","Configurable risk parameters"],
+    improvements:[
+      {text:"Backtest on 6–12 months of historical data before live deployment", p:1},
+      {text:"Define and document specific session setups (London, NY open)", p:1},
+      {text:"Build risk dashboard showing daily P&L vs. prop firm drawdown limits", p:2},
+      {text:"Add daily trade journal integration", p:2},
+    ],
+    timeSaved:10, timeSavedUnit:"hours of conversion work", lastWorked:"Jul 2025",
   },
 
-  // ── CONTENT & BRAND ──────────────────────────────────────
+  // ── CONTENT & BRAND ─────────────────────────
   {
     id:"cb-linkedin", category:"content",
     title:"LinkedIn Thought Leadership Posts",
     type:"Ongoing Content", status:"ongoing",
-    description:"Multiple LinkedIn posts crafted across themes: legacy vs. speed (senior leaders), unfiltered professional voice, AI adoption paradox, ACTC credential announcement (3 variants). Includes critique/revision cycles for tighter hooks and stronger endings.",
-    outputs:["6+ polished LinkedIn posts","ACTC announcement (3 variants — warm/personal, punchy, strategic)","AI transformation observation post","Legacy vs. speed post","Authentic professional voice post"],
-    timeSaved:8, timeSavedUnit:"hours of writing and editing",
-    improvements:["Build a content calendar (2 posts/week cadence)","Repurpose best-performing posts as carousel slides","Track engagement to identify highest-resonance themes","Create a LinkedIn newsletter for deeper thought leadership"],
-    links:["linkedin.com/in/juliancjohnson"], lastWorked:"Apr 2026",
+    description:"Ongoing library of LinkedIn posts across key themes: AI journey, interoperability/full stack leadership, ACTC credential, authentic professional voice. Written in your natural voice — no em dashes.",
+    features:["AI journey 2-part post (hook + depth)","Chamath reshare + full stack interoperability post","Military origin story PS","ACTC credential announcement (3 variants)","AI transformation observation post","Style guide: direct, no em dashes, short declarative sentences"],
+    links:[
+      {label:"LinkedIn Profile", url:"https://linkedin.com/in/juliancjohnson", primary:true},
+    ],
+    outputs:["8+ polished posts","Voice style guide","2-part post structure"],
+    improvements:[
+      {text:"Build a content calendar (2 posts/week cadence)", p:1},
+      {text:"Track engagement to identify highest-resonance themes", p:1},
+      {text:"Repurpose best-performing posts as carousel slides", p:2},
+      {text:"Create a LinkedIn newsletter for deeper thought leadership", p:3},
+    ],
+    timeSaved:8, timeSavedUnit:"hours of writing and editing", lastWorked:"Jun 2026",
+  },
+
+  // ── MASTER INVENTORY ────────────────────────
+  {
+    id:"meta-inventory", category:"unified",
+    title:"Master Inventory Dashboard (This Page)",
+    type:"Web Dashboard", status:"live",
+    description:"This living dashboard tracking all tools, websites, systems, and content built across professional and personal areas. Hosted on GitHub Pages with links, features, impact tracking, and prioritized roadmap.",
+    features:["All projects with links and key features","Category and status filters","Cumulative impact tracker","Prioritized improvement roadmap","GitHub Pages hosted","Single HTML file — easy to update"],
+    links:[
+      {label:"View Live", url:"#", primary:true, note:"Add your GitHub Pages URL after deploy"},
+      {label:"GitHub Repo", url:"#", primary:false},
+    ],
+    outputs:["index.html","README.md"],
+    improvements:[
+      {text:"Add your GitHub Pages URL to the Live link above", p:1},
+      {text:"Sync project links as tools are deployed", p:1},
+      {text:"Add new projects as they are built", p:2},
+    ],
+    timeSaved:3, timeSavedUnit:"hours of dashboard build", lastWorked:"Jun 2026",
   },
 ];
 
-// ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
 // COMPUTED
-// ──────────────────────────────────────────────────────────
-const totalHours = ITEMS.reduce((s, i) => s + i.timeSaved, 0);
-const liveCount  = ITEMS.filter(i => i.status === "live").length;
-const builtCount = ITEMS.filter(i => i.status === "built").length;
+// ─────────────────────────────────────────────
+const totalHours = ITEMS.reduce((s,i)=>s+i.timeSaved,0);
+const liveCount  = ITEMS.filter(i=>i.status==="live").length;
+const builtCount = ITEMS.filter(i=>i.status==="built").length;
 
-// ──────────────────────────────────────────────────────────
-// RENDER HEADER STATS
-// ──────────────────────────────────────────────────────────
-function renderStats() {
-  const stats = [
-    { value: ITEMS.length, label: "Total Projects" },
-    { value: liveCount, label: "Live / Deployed" },
-    { value: builtCount, label: "Built & Ready" },
-    { value: totalHours + "+", label: "Est. Hours Saved" },
-  ];
-  document.getElementById("statsRow").innerHTML = stats.map(s =>
-    `<div class="stat-card">
-      <div class="stat-value">${s.value}</div>
-      <div class="stat-label">${s.label}</div>
-    </div>`
-  ).join("");
-  document.getElementById("footer").textContent =
-    `Last updated: ${LAST_UPDATED} · Julian Johnson — Unified Solutions Inc. / The Quiet Edge`;
+// ─────────────────────────────────────────────
+// HEADER STATS
+// ─────────────────────────────────────────────
+function renderStats(){
+  document.getElementById("statsRow").innerHTML=[
+    {v:ITEMS.length,     l:"Total Projects"},
+    {v:liveCount,        l:"Live / Deployed"},
+    {v:builtCount,       l:"Built & Ready"},
+    {v:totalHours+"+",   l:"Est. Hours Saved"},
+  ].map(s=>`<div class="stat"><div class="stat-v">${s.v}</div><div class="stat-l">${s.l}</div></div>`).join("");
+  document.getElementById("footer").textContent=`Last updated: ${LAST_UPDATED} · Julian Johnson — Unified Solutions Inc. / The Quiet Edge`;
 }
 
-// ──────────────────────────────────────────────────────────
-// RENDER FILTERS
-// ──────────────────────────────────────────────────────────
-let activeCategory = "all";
+// ─────────────────────────────────────────────
+// FILTERS
+// ─────────────────────────────────────────────
+let activeCat="all", openCard=null;
 
-function renderFilters() {
-  const row = document.getElementById("filterRow");
-  const counts = {};
-  CATEGORIES.forEach(c => { counts[c.id] = ITEMS.filter(i => i.category === c.id).length; });
-
-  row.innerHTML = `<button class="filter-btn active-filter" style="background:#2E7D52;border-color:#2E7D52" onclick="setFilter('all',this)">All (${ITEMS.length})</button>` +
-    CATEGORIES.map(c =>
-      `<button class="filter-btn" onclick="setFilter('${c.id}',this)">${c.icon} ${c.label} (${counts[c.id]})</button>`
-    ).join("");
+function renderFilters(){
+  const cnt={};
+  CATS.forEach(c=>{cnt[c.id]=ITEMS.filter(i=>i.category===c.id).length});
+  document.getElementById("filterRow").innerHTML=
+    `<button class="fb on" style="background:#2E7D52;border-color:#2E7D52;color:#fff" onclick="setFilter('all',this)">All (${ITEMS.length})</button>`+
+    CATS.map(c=>`<button class="fb" onclick="setFilter('${c.id}',this)">${c.icon} ${c.label} (${cnt[c.id]})</button>`).join("");
 }
 
-function setFilter(catId, btn) {
-  activeCategory = catId;
-  document.querySelectorAll(".filter-btn").forEach(b => {
-    b.classList.remove("active-filter");
-    b.style.background = "";
-    b.style.borderColor = "";
-    b.style.color = "";
-  });
-  btn.classList.add("active-filter");
-  const cat = CATEGORIES.find(c => c.id === catId);
-  btn.style.background = cat ? cat.color : "#2E7D52";
-  btn.style.borderColor = "transparent";
-  btn.style.color = "#fff";
-  renderItems();
+function setFilter(id,btn){
+  activeCat=id;
+  document.querySelectorAll(".fb").forEach(b=>{b.classList.remove("on");b.style.background="";b.style.borderColor="";b.style.color=""});
+  btn.classList.add("on");
+  const cat=CATS.find(c=>c.id===id);
+  btn.style.background=cat?cat.color:"#2E7D52";
+  btn.style.borderColor="transparent";
+  btn.style.color="#fff";
+  renderCards();
 }
 
-// ──────────────────────────────────────────────────────────
-// RENDER ITEMS
-// ──────────────────────────────────────────────────────────
-let openItem = null;
+// ─────────────────────────────────────────────
+// CARDS
+// ─────────────────────────────────────────────
+function renderCards(){
+  const items=activeCat==="all"?ITEMS:ITEMS.filter(i=>i.category===activeCat);
+  document.getElementById("cardList").innerHTML=items.map((item,idx)=>{
+    const cat=CATS.find(c=>c.id===item.category);
+    const st=STATUS[item.status]||STATUS.complete;
+    const isOpen=openCard===item.id;
 
-function renderItems() {
-  const filtered = activeCategory === "all" ? ITEMS : ITEMS.filter(i => i.category === activeCategory);
-  const list = document.getElementById("itemsList");
-
-  list.innerHTML = filtered.map((item, idx) => {
-    const cat    = CATEGORIES.find(c => c.id === item.category);
-    const status = STATUS[item.status] || STATUS.complete;
-    const isOpen = openItem === item.id;
+    const linksHTML=item.links&&item.links.length?
+      `<div class="links-row">`+item.links.map(l=>`
+        <a class="link-btn ${l.primary?"primary":"secondary"}"
+           style="${l.primary?`background:${cat.color};border-color:${cat.color}`:`color:${cat.color};border-color:${cat.color}`}"
+           href="${l.url}" target="_blank" rel="noopener"
+           ${l.note?`title="${l.note}"`:""}
+           onclick="${l.url==='#'?'event.preventDefault();alert(\"'+((l.note)||'Link not yet set')+'\")':''}"
+        >🔗 ${l.label}</a>`).join("")+`</div>`:"";
 
     return `
-      <div class="item-card${isOpen ? " open" : ""}" id="card-${item.id}"
-           style="animation-delay:${idx * 0.04}s; ${isOpen ? `border-color:${cat.color}` : ""}">
-        <div class="item-header" onclick="toggleItem('${item.id}','${cat.color}')">
-          <div class="item-dot" style="background:${cat.color}"></div>
-          <div class="item-meta">
-            <div class="item-title-row">
-              <span class="item-title">${item.title}</span>
-              <span class="badge" style="background:${status.bg};color:${status.color}">${status.label}</span>
+    <div class="card${isOpen?" open":""}" id="card-${item.id}" style="${isOpen?`border-color:${cat.color}`:""}">
+      <div class="card-top" onclick="toggleCard('${item.id}','${cat.color}')">
+        <div class="card-top-row1">
+          <div class="dot" style="background:${cat.color}"></div>
+          <div style="flex:1">
+            <div class="card-title">${item.title}</div>
+            <div class="badges">
+              <span class="badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
               <span class="badge" style="background:${cat.light};color:${cat.color}">${item.type}</span>
             </div>
-            <div class="item-desc-preview">${item.description.slice(0, 120)}…</div>
           </div>
-          <div class="item-right">
-            <div class="hours-value" style="color:${cat.color}">~${item.timeSaved}h</div>
-            <div class="hours-label">saved</div>
-            <div class="chevron">▼</div>
-          </div>
-        </div>
-        <div class="item-detail">
-          <p class="item-full-desc">${item.description}</p>
-          <div class="detail-grid">
-            <div>
-              <div class="detail-section-label" style="color:${cat.color}">What Was Built</div>
-              ${item.outputs.map(o => `
-                <div class="detail-row">
-                  <span class="detail-row-icon" style="color:${cat.color}">✓</span> ${o}
-                </div>`).join("")}
-            </div>
-            <div>
-              <div class="detail-section-label" style="color:#7A5C2E">Suggested Improvements</div>
-              ${item.improvements.map(imp => `
-                <div class="detail-row">
-                  <span class="detail-row-icon" style="color:#B8860B">→</span> ${imp}
-                </div>`).join("")}
-            </div>
-          </div>
-          <div class="item-footer">
-            <span><strong>Last worked:</strong> ${item.lastWorked}</span>
-            <span><strong>Time saved:</strong> ~${item.timeSaved} ${item.timeSavedUnit}</span>
-            ${item.links.length ? `<span><strong>Links:</strong> ${item.links.join(", ")}</span>` : ""}
+          <div class="card-right">
+            <div class="hrs" style="color:${cat.color}">~${item.timeSaved}h</div>
+            <div class="hrs-l">saved</div>
+            <span class="chev">▼</span>
           </div>
         </div>
-      </div>`;
+      </div>
+
+      <div class="card-summary">
+        <div class="card-desc">${item.description}</div>
+        <div class="features">${item.features.map(f=>`<span class="feat-tag">${f}</span>`).join("")}</div>
+      </div>
+
+      ${linksHTML}
+
+      <div class="card-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="dl-label" style="color:${cat.color}">What Was Built</div>
+            ${item.outputs.map(o=>`<div class="dl-row"><span class="dl-icon" style="color:${cat.color}">✓</span>${o}</div>`).join("")}
+          </div>
+          <div>
+            <div class="dl-label" style="color:#7A5C2E">Improvement Queue</div>
+            ${item.improvements.map(imp=>{
+              const pr=P[imp.p];
+              return `<div class="dl-row">
+                <span class="badge" style="background:${pr.bg};color:${pr.color};padding:2px 7px;border-radius:8px;font-size:10px;flex-shrink:0">${pr.label}</span>
+                <span>${imp.text}</span>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+        <div class="card-foot">
+          <span><strong>Last worked:</strong> ${item.lastWorked}</span>
+          <span><strong>Time saved:</strong> ~${item.timeSaved} ${item.timeSavedUnit}</span>
+        </div>
+      </div>
+    </div>`;
   }).join("");
 }
 
-function toggleItem(id, borderColor) {
-  const wasOpen = openItem === id;
-  openItem = wasOpen ? null : id;
-  const allCards = document.querySelectorAll(".item-card");
-  allCards.forEach(c => {
-    c.classList.remove("open");
-    c.style.borderColor = "";
-    c.style.boxShadow = "";
-  });
-  if (!wasOpen) {
-    const card = document.getElementById("card-" + id);
-    if (card) {
-      card.classList.add("open");
-      card.style.borderColor = borderColor;
-      card.style.boxShadow = "0 4px 24px rgba(0,0,0,0.08)";
-    }
+function toggleCard(id,color){
+  const wasOpen=openCard===id;
+  openCard=wasOpen?null:id;
+  document.querySelectorAll(".card").forEach(c=>{c.classList.remove("open");c.style.borderColor="";c.style.boxShadow=""});
+  if(!wasOpen){
+    const card=document.getElementById("card-"+id);
+    if(card){card.classList.add("open");card.style.borderColor=color;card.style.boxShadow="0 4px 24px rgba(0,0,0,.08)"}
   }
 }
 
-// ──────────────────────────────────────────────────────────
-// RENDER IMPACT
-// ──────────────────────────────────────────────────────────
-function renderImpact() {
-  const catData = CATEGORIES.map(c => ({
+// ─────────────────────────────────────────────
+// IMPACT
+// ─────────────────────────────────────────────
+function renderImpact(){
+  const catData=CATS.map(c=>({
     ...c,
-    items: ITEMS.filter(i => i.category === c.id),
-    hours: ITEMS.filter(i => i.category === c.id).reduce((s, i) => s + i.timeSaved, 0),
+    items:ITEMS.filter(i=>i.category===c.id),
+    hours:ITEMS.filter(i=>i.category===c.id).reduce((s,i)=>s+i.timeSaved,0),
   }));
-
-  document.getElementById("impactContent").innerHTML =
-    catData.map(cat => `
-      <div class="impact-card">
-        <div class="impact-header">
-          <div>
-            <span style="font-size:18px;margin-right:8px">${cat.icon}</span>
-            <span class="impact-cat-name">${cat.label}</span>
-            <span style="color:#999;font-size:13px;margin-left:10px">${cat.items.length} projects</span>
-          </div>
-          <div class="impact-hours" style="color:${cat.color}">~${cat.hours}h</div>
+  document.getElementById("impactContent").innerHTML=
+    catData.map(cat=>`
+      <div class="imp-card">
+        <div class="imp-hdr">
+          <div><span style="font-size:18px;margin-right:8px">${cat.icon}</span><span class="imp-cat">${cat.label}</span><span style="color:#999;font-size:13px;margin-left:10px">${cat.items.length} projects</span></div>
+          <div class="imp-hrs" style="color:${cat.color}">~${cat.hours}h</div>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${Math.min(100,(cat.hours/totalHours)*100*2.4)}%;background:${cat.color}"></div>
-        </div>
-        <div class="impact-rows">
-          ${cat.items.map(item => `
-            <div class="impact-row">
-              <span>${item.title}</span>
-              <span style="color:${cat.color};font-weight:600">~${item.timeSaved}h</span>
-            </div>`).join("")}
-        </div>
-      </div>`).join("") +
-    `<div class="impact-total">
-      <div class="total-label">Total Estimated Impact</div>
-      <div class="total-value">${totalHours}+ hours</div>
-      <p class="total-note">
-        At a consulting rate of $200/hr, this represents ~$${(totalHours * 200).toLocaleString()} in equivalent professional services —
-        plus recurring time savings from automated tools (ICF tracker, Notion CRM, rental planner) that compound annually.
-      </p>
+        <div class="pbar"><div class="pfill" style="width:${Math.min(100,(cat.hours/totalHours)*240)}%;background:${cat.color}"></div></div>
+        <div>${cat.items.map(item=>`<div class="imp-row"><span>${item.title}</span><span style="color:${cat.color};font-weight:600">~${item.timeSaved}h</span></div>`).join("")}</div>
+      </div>`).join("")+
+    `<div class="imp-total">
+      <div class="tot-l">Total Estimated Impact</div>
+      <div class="tot-v">${totalHours}+ hours</div>
+      <p class="tot-note">At a consulting rate of $200/hr, this represents ~$${(totalHours*200).toLocaleString()} in equivalent professional services — plus recurring time savings from automated tools that compound annually.</p>
     </div>`;
 }
 
-// ──────────────────────────────────────────────────────────
-// RENDER IMPROVEMENTS
-// ──────────────────────────────────────────────────────────
-function renderImprovements() {
-  document.getElementById("improvementsContent").innerHTML = CATEGORIES.map(cat => {
-    const catItems = ITEMS.filter(i => i.category === cat.id);
-    const allImps  = catItems.flatMap(item => item.improvements.map(imp => ({ project: item.title, imp })));
-    return `
-      <div class="improve-card">
-        <div class="improve-header" style="background:${cat.color}">
-          <span style="font-size:18px">${cat.icon}</span>
-          <span class="improve-header-text">${cat.label}</span>
-          <span class="improve-count">— ${allImps.length} queued</span>
+// ─────────────────────────────────────────────
+// ROADMAP
+// ─────────────────────────────────────────────
+function renderRoadmap(){
+  // Flatten all improvements across all items with project context
+  const allImps=[];
+  ITEMS.forEach(item=>{
+    const cat=CATS.find(c=>c.id===item.category);
+    item.improvements.forEach(imp=>{
+      allImps.push({...imp, project:item.title, catColor:cat.color, catLight:cat.light});
+    });
+  });
+
+  // Sort by priority then group
+  const byPriority={1:[],2:[],3:[]};
+  allImps.forEach(imp=>byPriority[imp.p].push(imp));
+
+  const priLabels={
+    1:{label:"🔴 High Priority — Do Now",       color:"#991B1B", bg:"#7F1D1D"},
+    2:{label:"🟡 Medium — Next Sprint",          color:"#92400E", bg:"#78350F"},
+    3:{label:"⚪ Backlog — Future Consideration", color:"#374151", bg:"#1F2937"},
+  };
+
+  document.getElementById("roadmapContent").innerHTML=
+
+    `<div class="roadmap-intro">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--text-light);margin-bottom:6px">Priority Key</div>
+        <div class="priority-key">
+          <div class="pk-item"><div class="pk-dot" style="background:#991B1B"></div> High — Do Now (${byPriority[1].length} items)</div>
+          <div class="pk-item"><div class="pk-dot" style="background:#B45309"></div> Medium — Next Sprint (${byPriority[2].length} items)</div>
+          <div class="pk-item"><div class="pk-dot" style="background:#6B7280"></div> Backlog (${byPriority[3].length} items)</div>
         </div>
-        <div class="improve-body">
-          ${allImps.map(({project, imp}) => `
-            <div class="improve-item">
-              <div class="improve-arrow" style="background:${cat.light};color:${cat.color}">→</div>
-              <div>
-                <div class="improve-project" style="color:${cat.color}">${project}</div>
-                <div class="improve-text">${imp}</div>
+      </div>
+    </div>`+
+
+    [1,2,3].map(pNum=>`
+      <div class="rm-section">
+        <div class="rm-section-hdr" style="background:${priLabels[pNum].bg}">
+          ${priLabels[pNum].label}
+          <span style="opacity:.6;font-size:12px;font-family:var(--mono)">(${byPriority[pNum].length})</span>
+        </div>
+        <div class="rm-items">
+          ${byPriority[pNum].map(imp=>`
+            <div class="rm-item">
+              <div class="priority-badge" style="background:${P[pNum].bg};color:${P[pNum].color}">${P[pNum].label}</div>
+              <div class="rm-text">
+                <div class="rm-project" style="color:${imp.catColor}">${imp.project}</div>
+                <div class="rm-desc">${imp.text}</div>
               </div>
             </div>`).join("")}
         </div>
-      </div>`;
-  }).join("");
+      </div>`).join("");
 }
 
-// ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
 // TAB SWITCHING
-// ──────────────────────────────────────────────────────────
-function switchTab(id, btn) {
-  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("tab-" + id).classList.add("active");
-  btn.classList.add("active");
+// ─────────────────────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+  document.querySelectorAll(".tb").forEach(b=>b.classList.remove("on"));
+  document.getElementById("tab-"+id).classList.add("on");
+  btn.classList.add("on");
 }
 
-// ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
 // INIT
-// ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
 renderStats();
 renderFilters();
-renderItems();
+renderCards();
 renderImpact();
-renderImprovements();
+renderRoadmap();
 </script>
 </body>
 </html>
